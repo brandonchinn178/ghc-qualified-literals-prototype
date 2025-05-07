@@ -1,0 +1,59 @@
+name: ghc-qualified-literals-prototype
+version: 0.1.0
+category: Text
+synopsis: Prototype for QualifiedLiterals.
+description: Prototype for QualifiedLiterals. See README.md for more details
+license: BSD3
+license-file: LICENSE.md
+author: Brandon Chinn <brandonchinn178@gmail.com>
+maintainer: Brandon Chinn <brandonchinn178@gmail.com>
+
+extra-source-files:
+  - README.md
+
+github: brandonchinn178/ghc-qualified-literals-prototype
+
+ghc-options:
+  - -Wall
+  - -Werror
+  - -Wcompat
+  - -Wincomplete-record-updates
+  - -Wincomplete-uni-patterns
+  - -Wnoncanonical-monad-instances
+
+library:
+  source-dirs: src
+  dependencies:
+    - base
+    - containers
+    - megaparsec
+    - text
+    - template-haskell
+  language: GHC2021
+
+executables:
+  ghc-qualified-literals-prototype:
+    source-dirs: exe
+    main: Preprocessor.hs
+    dependencies:
+      - base
+      - ghc-qualified-literals-prototype
+      - text
+    language: GHC2021
+
+  example:
+    source-dirs: example
+    main: Main.hs
+    ghc-options: -F -pgmF ghc-qualified-literals-prototype
+    build-tools:
+      - ghc-qualified-literals-prototype:ghc-qualified-literals-prototype
+    dependencies:
+      - base
+      - ghc-qualified-literals-prototype
+    language: GHC2021
+
+    # dont generate path file
+    # https://github.com/sol/hpack?tab=readme-ov-file#legacy-behavior
+    when:
+      - condition: false
+        other-modules: Paths_ghc_qualified_literals_prototype

@@ -1,0 +1,68 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.37.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           ghc-qualified-literals-prototype
+version:        0.1.0
+synopsis:       Prototype for QualifiedLiterals.
+description:    Prototype for QualifiedLiterals. See README.md for more details
+category:       Text
+homepage:       https://github.com/brandonchinn178/ghc-qualified-literals-prototype#readme
+bug-reports:    https://github.com/brandonchinn178/ghc-qualified-literals-prototype/issues
+author:         Brandon Chinn <brandonchinn178@gmail.com>
+maintainer:     Brandon Chinn <brandonchinn178@gmail.com>
+license:        BSD3
+license-file:   LICENSE.md
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/brandonchinn178/ghc-qualified-literals-prototype
+
+library
+  exposed-modules:
+      QualifiedLiterals
+      QualifiedLiterals.Internal.Parse
+  other-modules:
+      Paths_ghc_qualified_literals_prototype
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Werror -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
+  build-depends:
+      base
+    , containers
+    , megaparsec
+    , template-haskell
+    , text
+  default-language: GHC2021
+
+executable example
+  main-is: Main.hs
+  other-modules:
+      Example.TimesTwo
+  hs-source-dirs:
+      example
+  ghc-options: -Wall -Werror -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances -F -pgmF ghc-qualified-literals-prototype
+  build-tools:
+      ghc-qualified-literals-prototype
+  build-depends:
+      base
+    , ghc-qualified-literals-prototype
+  default-language: GHC2021
+
+executable ghc-qualified-literals-prototype
+  main-is: Preprocessor.hs
+  other-modules:
+      Paths_ghc_qualified_literals_prototype
+  hs-source-dirs:
+      exe
+  ghc-options: -Wall -Werror -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
+  build-depends:
+      base
+    , ghc-qualified-literals-prototype
+    , text
+  default-language: GHC2021
