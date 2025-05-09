@@ -25,12 +25,12 @@ data HaskellCodeChunk
   | QualifiedNaturalExpr ModuleName Integer
   | QualifiedNegativeIntegerExpr ModuleName Integer
   | QualifiedRationalExpr ModuleName Rational
-  | QualifiedStringExpr ModuleName String
+  | QualifiedStringExpr ModuleName Text
   | QualifiedListExpr ModuleName [HaskellCodeSrc]
   | QualifiedNaturalPat ModuleName Integer
   | QualifiedNegativeIntegerPat ModuleName Integer
   | QualifiedRationalPat ModuleName Rational
-  | QualifiedStringPat ModuleName String
+  | QualifiedStringPat ModuleName Text
   | QualifiedListPat ModuleName [HaskellCodeSrc]
   | QualifiedListConsPat ModuleName [HaskellCodeSrc]
   deriving (Show)
@@ -78,7 +78,7 @@ parseHaskellCode = HaskellCode <$> parseCodeChunks
 
 parseQualifiedLiteral :: Parser HaskellCodeChunk
 parseQualifiedLiteral = do
-  mod <- Text.intercalate "." <$> many parseModDot
+  mod <- Text.intercalate "." <$> some parseModDot
   isPat <- isJust <$> optional (char '!')
   choice . map try $
     [ do
@@ -102,8 +102,13 @@ parseQualifiedLiteral = do
             pure $ e <> neg <> ds
           pure $ readT (prefix <> intDigits <> fracDigits <> exp)
         pure $ if isPat then QualifiedRationalPat mod x else QualifiedRationalExpr mod x
-    -- TODO: strings
-    -- TODO: lists
+    , do
+        s <- between (char '"') (char '"') $ takeWhileP Nothing (/= '"')
+        pure $ if isPat then QualifiedStringPat mod s else QualifiedStringExpr mod s
+    , do
+        srcs <- between (char '[') (char ']') $
+          takeWhile1P Nothing (not . (`isin` ",]")) `sepBy` (char ',')
+        pure $ if isPat then QualifiedListPat mod srcs else QualifiedListExpr mod srcs
     ]
   where
     optOrEmpty = fmap (fromMaybe "") . optional

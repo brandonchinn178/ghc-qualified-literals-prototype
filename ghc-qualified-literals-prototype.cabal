@@ -43,6 +43,8 @@ library
 executable example
   main-is: Main.hs
   other-modules:
+      Example.HList
+      Example.Text
       Example.TimesTwo
   hs-source-dirs:
       example
@@ -52,6 +54,7 @@ executable example
   build-depends:
       base
     , ghc-qualified-literals-prototype
+    , text
   default-language: GHC2021
 
 executable ghc-qualified-literals-prototype

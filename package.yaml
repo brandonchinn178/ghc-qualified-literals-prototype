@@ -50,6 +50,7 @@ executables:
     dependencies:
       - base
       - ghc-qualified-literals-prototype
+      - text
     language: GHC2021
 
     # dont generate path file

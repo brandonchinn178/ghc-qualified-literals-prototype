@@ -11,9 +11,12 @@ import Prelude hiding (mod)
 import QualifiedLiterals.Internal.Parse
 
 processFile :: FilePath -> Text -> IO Text
-processFile path file =
-  -- (\m -> m >>= \x -> putStrLn (Text.unpack x) >> pure x) $ -- uncomment to debug
-  transform <$> parseHaskellFile path file
+processFile path file = do
+  code <- parseHaskellFile path file
+  -- if path == "example/Main.hs" then print code else pure () -- uncomment to debug
+  let code' = transform code
+  -- if path == "example/Main.hs" then putStrLn $ Text.unpack code' else pure () -- uncomment to debug
+  pure code'
   where
     transform = addLinePragma . addViewPatterns . process
 
@@ -29,13 +32,27 @@ process (HaskellCode codeChunks) =
     QualifiedNaturalExpr mod x -> parens $ mod <> ".fromNatural " <> showT x
     QualifiedNegativeIntegerExpr mod x -> parens $ mod <> ".fromNegativeInteger " <> showT x
     QualifiedRationalExpr _ _ -> undefined -- TODO
-    QualifiedStringExpr _ _ -> undefined -- TODO
-    QualifiedListExpr _ _ -> undefined -- TODO
+    QualifiedStringExpr mod s -> parens $ mod <> ".fromString " <> showT s
+    QualifiedListExpr mod srcs ->
+      let
+        lam = "\\cons_new_var___ nil_new_var___ -> " <> expr
+        expr =
+          foldr
+            (\src acc -> parens src <> " `cons_new_var___` " <> parens acc)
+            "nil_new_var___"
+            srcs
+      in
+        parens $ mod <> ".buildList " <> parens lam
     QualifiedNaturalPat mod x -> parens $ mod <> ".matchNatural " <> showT x <> " -> True"
     QualifiedNegativeIntegerPat _ _ -> undefined -- TODO
     QualifiedRationalPat _ _ -> undefined -- TODO
-    QualifiedStringPat _ _ -> undefined -- TODO
-    QualifiedListPat _ _ -> undefined -- TODO
+    QualifiedStringPat mod s -> parens $ mod <> ".matchString " <> showT s <> " -> True"
+    QualifiedListPat mod srcs ->
+      parens $
+        foldr
+          (\src acc -> mod <> ".ListCons " <> parens src <> " " <> parens acc)
+          (mod <> ".ListNil")
+          srcs
     QualifiedListConsPat _ _ -> undefined -- TODO
   where
     parens s = "(" <> s <> ")"
