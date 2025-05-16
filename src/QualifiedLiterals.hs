@@ -18,12 +18,10 @@ processFile path file = do
   -- if path == "example/Main.hs" then putStrLn $ Text.unpack code' else pure () -- uncomment to debug
   pure code'
   where
-    transform = addLinePragma . addViewPatterns . process
+    transform = addLinePragma . process
 
     -- tells GHC to use the original path in error messages
     addLinePragma src = "{-# LINE 1 " <> showT path <> " #-}\n" <> src
-
-    addViewPatterns src = "{-# LANGUAGE ViewPatterns #-}\n" <> src
 
 process :: HaskellCode -> Text
 process (HaskellCode codeChunks) =
@@ -43,15 +41,15 @@ process (HaskellCode codeChunks) =
             srcs
       in
         parens $ mod <> ".buildList " <> parens lam
-    QualifiedNaturalPat mod x -> parens $ mod <> ".matchNatural " <> showT x <> " -> True"
+    QualifiedNaturalPat mod x -> parens $ mod <> ".FromNatural " <> showT x
     QualifiedNegativeIntegerPat _ _ -> undefined -- TODO
     QualifiedRationalPat _ _ -> undefined -- TODO
-    QualifiedStringPat mod s -> parens $ mod <> ".matchString " <> showT s <> " -> True"
+    QualifiedStringPat mod s -> parens $ mod <> ".FromString " <> showT s
     QualifiedListPat mod srcs ->
       parens $
         foldr
-          (\src acc -> mod <> ".ListCons " <> parens src <> " " <> parens acc)
-          (mod <> ".ListNil")
+          (\src acc -> mod <> ".FromListCons " <> parens src <> " " <> parens acc)
+          (mod <> ".FromListNil")
           srcs
     QualifiedListConsPat _ _ -> undefined -- TODO
   where

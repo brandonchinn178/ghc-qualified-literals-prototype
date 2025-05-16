@@ -34,10 +34,7 @@ main = do
 
 testHListExhaustive :: HList.HList Maybe '[()] -> IO ()
 testHListExhaustive hl =
-  -- TODO: why doesn't the view pattern work?
   case hl of
-    HList.HCons (Just ()) HList.HNil -> putStrLn "Got: Just"
-    HList.HCons Nothing HList.HNil -> putStrLn "Got: Nothing"
-    -- HList.![Just ()] -> putStrLn "Got: Just"
-    -- HList.![Nothing] -> putStrLn "Got: Nothing"
-    -- -- should compile without raising -Wincomplete-patterns
+    HList.![Just ()] -> putStrLn "Got: Just"
+    HList.![Nothing] -> putStrLn "Got: Nothing"
+    -- should compile without raising -Wincomplete-patterns

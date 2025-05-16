@@ -20,10 +20,10 @@ buildList ::
   ) -> HList f xs
 buildList f = f HCons HNil
 
-pattern ListCons :: f x -> HList f xs -> HList f (x ': xs)
-pattern ListCons a b = HCons a b
+pattern FromListCons :: () => xs ~ (x0 ': xs0) => f x0 -> HList f xs0 -> HList f xs
+pattern FromListCons a b = HCons a b
 
-pattern ListNil :: HList f '[]
-pattern ListNil = HNil
+pattern FromListNil :: () => xs ~ '[] => HList f xs
+pattern FromListNil = HNil
 
-{-# COMPLETE ListCons, ListNil #-}
+{-# COMPLETE FromListCons, FromListNil #-}
